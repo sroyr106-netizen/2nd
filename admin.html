@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - FaceAttend</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Face-API.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+    <!-- jsPDF for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+    <div class="background-animation"></div>
+
+    <header>
+        <a href="index.html" class="logo">
+            <div class="logo-icon">FA</div>
+            FaceAttend
+        </a>
+        <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+                <div class="theme-toggle-slider">🌙</div>
+            </div>
+            <button class="btn-logout hidden" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <h2 class="login-title">🔐 Admin Login</h2>
+            <div id="loginAlert" class="alert"></div>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="username" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+            </form>
+            <p style="text-align: center; margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                Default: admin / admin123
+            </p>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <div class="container">
+            <h1 class="dashboard-title">Admin Dashboard</h1>
+
+            <!-- Navigation Tabs -->
+            <div class="nav-tabs">
+                <div class="nav-tab active" onclick="switchTab('register')">📝 Register Student</div>
+                <div class="nav-tab" onclick="switchTab('subjects')">📚 Manage Subjects</div>
+                <div class="nav-tab" onclick="switchTab('scan')">📸 Scan Attendance</div>
+                <div class="nav-tab" onclick="switchTab('records')">📊 View Records</div>
+                <div class="nav-tab" onclick="switchTab('manageStudents')">👥 Manage Students</div>
+                <div class="nav-tab" onclick="switchTab('settings')">⚙️ Settings</div>
+            </div>
+
+            <!-- Register Student Section -->
+            <div class="section active" id="registerSection">
+                <div class="card">
+                    <h2 class="card-title">Register New Student</h2>
+                    <div id="registerAlert" class="alert"></div>
+
+                    <div class="loading" id="modelsLoading">
+                        <div class="spinner"></div>
+                        <p>Loading face recognition models...</p>
+                    </div>
+
+                    <div id="registerForm" class="hidden">
+                        <div class="camera-container">
+                            <video id="video" autoplay muted playsinline></video>
+                            <canvas id="captureCanvas" class="hidden"></canvas>
+                            <div class="camera-overlay"></div>
+                        </div>
+
+                        <div class="camera-controls">
+                            <button class="btn btn-primary" onclick="capturePhoto()">📷 Capture Face</button>
+                            <button class="btn btn-secondary" onclick="switchCamera()">🔄 Switch Camera</button>
+                        </div>
+
+                        <form onsubmit="registerStudent(event)">
+                            <div class="form-group">
+                                <label>Student Name *</label>
+                                <input type="text" id="studentName" placeholder="Enter full name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>College ID *</label>
+                                <input type="text" id="collegeId" placeholder="Enter college ID" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Roll Number *</label>
+                                <input type="text" id="rollNumber" placeholder="Enter roll number" required>
+                            </div>
+                            <button type="submit" class="btn btn-success" style="width: 100%;">✅ Register
+                                Student</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manage Subjects Section -->
+            <div class="section" id="subjectsSection">
+                <div class="card">
+                    <h2 class="card-title">Manage Subjects</h2>
+                    <div id="subjectsAlert" class="alert"></div>
+
+                    <form onsubmit="addSubject(event)">
+                        <div class="form-group">
+                            <label>Subject Name</label>
+                            <input type="text" id="subjectName" placeholder="Enter subject name" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">➕ Add Subject</button>
+                    </form>
+
+                    <div class="subject-list" id="subjectList"></div>
+                </div>
+            </div>
+
+            <!-- Scan Attendance Section -->
+            <div class="section" id="scanSection">
+                <div class="card">
+                    <h2 class="card-title">Scan Attendance</h2>
+                    <div id="scanAlert" class="alert"></div>
+
+                    <div class="form-group">
+                        <label>Select Subject *</label>
+                        <select id="scanSubject" required>
+                            <option value="">-- Select Subject --</option>
+                        </select>
+                    </div>
+
+                    <div class="camera-container">
+                        <video id="scanVideo" autoplay muted playsinline></video>
+                        <div class="camera-overlay"></div>
+                    </div>
+
+                    <div class="camera-controls">
+                        <button class="btn btn-primary" onclick="scanFace()">🔍 Scan Face</button>
+                        <button class="btn btn-secondary" onclick="switchScanCamera()">🔄 Switch Camera</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View Records Section -->
+            <div class="section" id="recordsSection">
+                <div class="card">
+                    <h2 class="card-title">Attendance Records</h2>
+
+                    <div class="btn-group" style="margin-bottom: 1.5rem;">
+                        <div class="form-group" style="margin: 0; flex: 1;">
+                            <select id="filterSubject" onchange="filterRecords()">
+                                <option value="">All Subjects</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin: 0; flex: 1;">
+                            <input type="date" id="filterDate" onchange="filterRecords()">
+                        </div>
+                        <div class="form-group" style="margin: 0; flex: 1;">
+                            <input type="text" id="searchStudent" placeholder="Search student..."
+                                oninput="filterRecords()">
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="copyRecords()">📋 Copy</button>
+                        <button class="btn btn-success" onclick="exportExcel()">📊 Export Excel</button>
+                        <button class="btn btn-danger" onclick="exportPDF()">📄 Export PDF</button>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="recordsTable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Student Name</th>
+                                    <th>College ID</th>
+                                    <th>Roll Number</th>
+                                    <th>Subject</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recordsBody">
+                                <tr>
+                                    <td colspan="6"
+                                        style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                        No records found
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manage Students Section -->
+            <div class="section" id="manageStudentsSection">
+                <div class="card">
+                    <h2 class="card-title">Manage Students</h2>
+                    <div id="manageStudentsAlert" class="alert"></div>
+
+                    <div class="form-group">
+                        <label>Search Students</label>
+                        <input type="text" id="searchStudents"
+                            placeholder="Search by name, college ID, or roll number..." oninput="searchStudents()">
+                    </div>
+
+                    <div class="students-list" id="studentsList">
+                        <p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No students
+                            registered yet</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div class="section" id="settingsSection">
+                <div class="card">
+                    <h2 class="card-title">Admin Settings</h2>
+                    <div id="settingsAlert" class="alert"></div>
+
+                    <form onsubmit="updateCredentials(event)">
+                        <div class="form-group">
+                            <label>New Username</label>
+                            <input type="text" id="newUsername" placeholder="Enter new username" required>
+                        </div>
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <input type="password" id="newPassword" placeholder="Enter new password" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm Password</label>
+                            <input type="password" id="confirmPassword" placeholder="Confirm new password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">💾 Update Credentials</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+
+</html>

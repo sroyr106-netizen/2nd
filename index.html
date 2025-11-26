@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrbiAttend - Smart Attendance System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Light Theme */
+            --bg-primary: #ffffff;
+            --bg-secondary: #1bc9cf;
+            --bg-gradient-start: #1ab6b6;
+            --bg-gradient-end: #f67728;
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --text-accent: #667eea;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --card-border: rgba(102, 126, 234, 0.1);
+            --shadow-color: rgba(102, 126, 234, 0.15);
+            --button-gradient-start: #667eea;
+            --button-gradient-end: #764ba2;
+            --button-hover-start: #5568d3;
+            --button-hover-end: #6a3f91;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme */
+            --bg-primary: #07122a;
+            --bg-secondary: #1e293b;
+            --bg-gradient-start: #a37b13;
+            --bg-gradient-end: #030303;
+            --text-primary: #2f9c1b;
+            --text-secondary: #b1b9c2;
+            --text-accent: #4a20c8;
+            --card-bg: rgba(30, 41, 59, 0.95);
+            --card-border: rgba(124, 58, 237, 0.2);
+            --shadow-color: rgba(124, 58, 237, 0.25);
+            --button-gradient-start: #4b9138;
+            --button-gradient-end: #ec4899;
+            --button-hover-start: #6d28d9;
+            --button-hover-end: #5a9d0d;
+            --glass-bg: rgba(30, 41, 59, 0.3);
+            --glass-border: rgba(124, 58, 237, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* Animated Background */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            opacity: 0.05;
+        }
+
+        .background-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--bg-gradient-start) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Header */
+        header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            background: var(--glass-bg);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgb(154, 181, 36);
+            font-weight: bold;
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            width: 60px;
+            height: 30px;
+            background: var(--bg-secondary);
+            border-radius: 30px;
+            position: relative;
+            cursor: pointer;
+            border: 2px solid var(--card-border);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        .theme-toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 22px;
+            height: 22px;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        [data-theme="dark"] .theme-toggle-slider {
+            transform: translateX(30px);
+        }
+
+        /* Hero Section */
+        .hero {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2vw, 1.3rem);
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        /* Feature Cards */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px var(--shadow-color);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 48px var(--shadow-color);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 16px var(--shadow-color);
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* CTA Buttons */
+        .cta-container {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 3rem;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--button-gradient-start), var(--button-gradient-end));
+            color: white;
+            box-shadow: 0 4px 20px var(--shadow-color);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--button-hover-start), var(--button-hover-end));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px var(--shadow-color);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--card-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: var(--glass-bg);
+            border-color: var(--text-accent);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem 1.5rem;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .logo-icon {
+                width: 35px;
+                height: 35px;
+            }
+
+            .hero {
+                padding: 3rem 1.5rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .cta-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 1.2rem 2rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero, .features, .cta-container {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .features {
+            animation-delay: 0.2s;
+        }
+
+        .cta-container {
+            animation-delay: 0.4s;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation"></div>
+
+    <header>
+        <div class="logo">
+            <div class="logo-icon">FA</div>
+            FaceAttend
+        </div>
+        <div class="theme-toggle" onclick="toggleTheme()">
+            <div class="theme-toggle-slider">🌙</div>
+        </div>
+    </header>
+
+    <main class="hero">
+        <h1 class="hero-title">Smart Facial Recognition Attendance</h1>
+        <p class="hero-subtitle">
+            Revolutionize attendance tracking with AI-powered facial recognition. 
+            Fast, accurate, and completely contactless.
+        </p>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">👤</div>
+                <h3 class="feature-title">Face Registration</h3>
+                <p class="feature-description">
+                    Register students instantly using advanced facial recognition technology with secure data storage.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📚</div>
+                <h3 class="feature-title">Subject Management</h3>
+                <p class="feature-description">
+                    Dynamically add and manage subjects with automatic integration into attendance tracking.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Smart Analytics</h3>
+                <p class="feature-description">
+                    Export attendance data to Excel or PDF with comprehensive filtering and reporting options.
+                </p>
+            </div>
+        </div>
+
+        <div class="cta-container">
+            <a href="admin.html" class="btn btn-primary">
+                🔐 Admin Login
+            </a>
+            <a href="student.html" class="btn btn-secondary">
+                👨‍🎓 Student Portal
+            </a>
+        </div>
+    </main>
+
+    <script>
+        // Theme Toggle Functionality
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Update icon
+            const slider = document.querySelector('.theme-toggle-slider');
+            slider.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Load saved theme
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            
+            const slider = document.querySelector('.theme-toggle-slider');
+            slider.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        });
+    </script>
+</body>
+</html>

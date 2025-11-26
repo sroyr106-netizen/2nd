@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal - FaceAttend</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+       
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-gradient-start: #667eea;
+            --bg-gradient-end: #764ba2;
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --text-accent: #667eea;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --card-border: rgba(102, 126, 234, 0.1);
+            --shadow-color: rgba(102, 126, 234, 0.15);
+            --button-gradient-start: #667eea;
+            --button-gradient-end: #764ba2;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --input-bg: #ffffff;
+            --input-border: #e2e8f0;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-gradient-start: #7c3aed;
+            --bg-gradient-end: #ec4899;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-accent: #a78bfa;
+            --card-bg: rgba(30, 41, 59, 0.95);
+            --card-border: rgba(124, 58, 237, 0.2);
+            --shadow-color: rgba(124, 58, 237, 0.25);
+            --button-gradient-start: #7c3aed;
+            --button-gradient-end: #ec4899;
+            --glass-bg: rgba(30, 41, 59, 0.3);
+            --glass-border: rgba(124, 58, 237, 0.3);
+            --input-bg: #1e293b;
+            --input-border: #334155;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            opacity: 0.05;
+        }
+
+        /* Header */
+        header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            background: var(--glass-bg);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            width: 60px;
+            height: 30px;
+            background: var(--bg-secondary);
+            border-radius: 30px;
+            position: relative;
+            cursor: pointer;
+            border: 2px solid var(--card-border);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 22px;
+            height: 22px;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        [data-theme="dark"] .theme-toggle-slider {
+            transform: translateX(30px);
+        }
+
+        .btn-logout {
+            padding: 0.6rem 1.5rem;
+            background: transparent;
+            border: 2px solid var(--card-border);
+            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: var(--glass-bg);
+            border-color: var(--error-color);
+            color: var(--error-color);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 100px);
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 3rem;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 8px 32px var(--shadow-color);
+            backdrop-filter: blur(10px);
+        }
+
+        .login-title {
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .welcome-section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px var(--shadow-color);
+            text-align: center;
+        }
+
+        .welcome-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .student-info {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Card */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            backdrop-filter: blur(10px);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            border: 2px solid var(--input-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--text-accent);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Button */
+        .btn {
+            padding: 0.9rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--button-gradient-start), var(--button-gradient-end));
+            color: white;
+            box-shadow: 0 4px 16px var(--shadow-color);
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px var(--shadow-color);
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        th {
+            background: var(--bg-secondary);
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        tr:hover {
+            background: var(--glass-bg);
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-present {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-color);
+        }
+
+        /* Alert */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid var(--error-color);
+            color: var(--error-color);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Progress Circle */
+        .progress-circle {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+        }
+
+        .progress-circle svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-circle-bg {
+            fill: none;
+            stroke: var(--card-border);
+            stroke-width: 10;
+        }
+
+        .progress-circle-fill {
+            fill: none;
+            stroke: url(#gradient);
+            stroke-width: 10;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .login-card,
+            .welcome-section {
+                padding: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th,
+            td {
+                padding: 0.7rem;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background-animation"></div>
+
+    <header>
+        <a href="index.html" class="logo">
+            <div class="logo-icon">FA</div>
+            FaceAttend
+        </a>
+        <div class="header-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+                <div class="theme-toggle-slider">🌙</div>
+            </div>
+            <button class="btn-logout hidden" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <h2 class="login-title">👨‍🎓 Student Login</h2>
+            <div id="loginAlert" class="alert"></div>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>College ID</label>
+                    <input type="text" id="collegeId" placeholder="Enter your college ID" required>
+                </div>
+                <div class="form-group">
+                    <label>Roll Number</label>
+                    <input type="text" id="rollNumber" placeholder="Enter your roll number" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <div class="container">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <h1 class="welcome-title">Welcome, <span id="studentName">Student</span>! 👋</h1>
+                <p class="student-info">
+                    <strong>College ID:</strong> <span id="displayCollegeId"></span> |
+                    <strong>Roll Number:</strong> <span id="displayRollNumber"></span>
+                </p>
+
+                <!-- Overall Attendance Circle -->
+                <div class="progress-circle">
+                    <svg width="150" height="150">
+                        <defs>
+                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <circle class="progress-circle-bg" cx="75" cy="75" r="65"></circle>
+                        <circle class="progress-circle-fill" cx="75" cy="75" r="65" stroke-dasharray="408.4"
+                            stroke-dashoffset="408.4" id="progressCircle"></circle>
+                    </svg>
+                    <div class="progress-text" id="overallPercentage">0%</div>
+                </div>
+                <p style="color: var(--text-secondary); font-weight: 600;">Overall Attendance</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-label">Total Classes</div>
+                    <div class="stat-value" id="totalClasses">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-label">Classes Attended</div>
+                    <div class="stat-value" id="attendedClasses">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-label">Subjects Enrolled</div>
+                    <div class="stat-value" id="subjectsCount">0</div>
+                </div>
+            </div>
+
+            <!-- Subject-wise Attendance -->
+            <div class="card">
+                <h2 class="card-title">Subject-wise Attendance</h2>
+                <div id="subjectAttendance"></div>
+            </div>
+
+            <!-- Date-wise Attendance -->
+            <div class="card">
+                <h2 class="card-title">Recent Attendance Records</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Subject</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceRecords">
+                            <tr>
+                                <td colspan="4"
+                                    style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                    No attendance records found
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStudent = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTheme();
+        });
+
+        // Theme Management
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            document.querySelector('.theme-toggle-slider').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.querySelector('.theme-toggle-slider').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Login
+        function handleLogin(e) {
+            e.preventDefault();
+            const collegeId = document.getElementById('collegeId').value.trim();
+            const rollNumber = document.getElementById('rollNumber').value.trim();
+
+            const students = JSON.parse(localStorage.getItem('students') || '[]');
+            const student = students.find(s =>
+                s.collegeId.toLowerCase() === collegeId.toLowerCase() &&
+                s.rollNumber.toLowerCase() === rollNumber.toLowerCase()
+            );
+
+            if (student) {
+                currentStudent = student;
+                showDashboard();
+            } else {
+                showAlert('loginAlert', 'Invalid credentials. Please check your College ID and Roll Number.', 'error');
+            }
+        }
+
+        function logout() {
+            currentStudent = null;
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('dashboard').classList.remove('active');
+            document.querySelector('.btn-logout').classList.add('hidden');
+            document.getElementById('collegeId').value = '';
+            document.getElementById('rollNumber').value = '';
+        }
+
+        // Show Dashboard
+        function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').classList.add('active');
+            document.querySelector('.btn-logout').classList.remove('hidden');
+
+            // Display student info
+            document.getElementById('studentName').textContent = currentStudent.name;
+            document.getElementById('displayCollegeId').textContent = currentStudent.collegeId;
+            document.getElementById('displayRollNumber').textContent = currentStudent.rollNumber;
+
+            // Load attendance data
+            loadAttendanceData();
+        }
+
+        // Load Attendance Data
+        function loadAttendanceData() {
+            const allAttendance = JSON.parse(localStorage.getItem('attendance') || '[]');
+            const studentAttendance = allAttendance.filter(a => a.studentId === currentStudent.id);
+            const subjects = JSON.parse(localStorage.getItem('subjects') || '[]');
+
+            // Calculate overall stats
+            const totalClasses = studentAttendance.length;
+            const attendedClasses = studentAttendance.filter(a => a.status === 'present').length;
+            const percentage = totalClasses > 0 ? Math.round((attendedClasses / totalClasses) * 100) : 0;
+
+            // Update stats
+            document.getElementById('totalClasses').textContent = totalClasses;
+            document.getElementById('attendedClasses').textContent = attendedClasses;
+            document.getElementById('subjectsCount').textContent = subjects.length;
+            document.getElementById('overallPercentage').textContent = percentage + '%';
+
+            // Update progress circle
+            const circle = document.getElementById('progressCircle');
+            const circumference = 408.4;
+            const offset = circumference - (percentage / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+
+            // Subject-wise attendance
+            displaySubjectAttendance(studentAttendance, subjects);
+
+            // Recent records
+            displayRecentRecords(studentAttendance);
+        }
+
+        // Display Subject-wise Attendance
+        function displaySubjectAttendance(attendance, subjects) {
+            const container = document.getElementById('subjectAttendance');
+
+            if (subjects.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No subjects available</p>';
+                return;
+            }
+
+            let html = '<div style="display: grid; gap: 1rem;">';
+
+            subjects.forEach(subject => {
+                const subjectRecords = attendance.filter(a => a.subject === subject);
+                const total = subjectRecords.length;
+                const attended = subjectRecords.filter(a => a.status === 'present').length;
+                const percent = total > 0 ? Math.round((attended / total) * 100) : 0;
+
+                html += `
+                    <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: 12px; border: 2px solid var(--card-border);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <h3 style="font-weight: 700; color: var(--text-primary);">${subject}</h3>
+                            <span style="font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${percent}%</span>
+                        </div>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">${attended} / ${total} classes attended</p>
+                        <div style="background: var(--card-border); height: 8px; border-radius: 10px; margin-top: 0.75rem; overflow: hidden;">
+                            <div style="background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end)); height: 100%; width: ${percent}%; border-radius: 10px; transition: width 0.5s ease;"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Display Recent Records
+        function displayRecentRecords(attendance) {
+            const tbody = document.getElementById('attendanceRecords');
+
+            if (attendance.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-secondary);">No attendance records found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            const sorted = [...attendance].sort((a, b) => {
+                const dateA = new Date(a.date + ' ' + a.time);
+                const dateB = new Date(b.date + ' ' + b.time);
+                return dateB - dateA;
+            });
+
+            sorted.slice(0, 20).forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.date}</td>
+                    <td>${record.time}</td>
+                    <td>${record.subject}</td>
+                    <td><span class="status-badge status-present">Present</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Alert Helper
+        function showAlert(elementId, message, type) {
+            const alert = document.getElementById(elementId);
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 5000);
+        }
+    </script>
+</body>
+
+</html>
